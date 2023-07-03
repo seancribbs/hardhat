@@ -24,7 +24,8 @@ defmodule Hardhat.MixProject do
       {:tesla, "~> 1.7"},
       {:finch, "~> 0.16.0"},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
-      {:dialyxir, "~> 1.3.0", only: :dev}
+      {:dialyxir, "~> 1.3.0", only: :dev},
+      {:bypass, "~> 2.1.0", only: :test}
     ]
   end
 
