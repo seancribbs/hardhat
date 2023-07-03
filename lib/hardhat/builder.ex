@@ -21,7 +21,3 @@ defmodule Hardhat.Builder do
     end
   end
 end
-
-defmodule Hardhat.Tester do
-  use Hardhat
-end
