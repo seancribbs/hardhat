@@ -29,7 +29,7 @@ defmodule Hardhat.MixProject do
   end
 
   defp package do
-  [
+    [
       licenses: ["MIT"],
       links: %{
         "GitHub" => "https://github.com/seancribbs/hardhat"
