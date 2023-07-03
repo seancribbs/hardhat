@@ -1,2 +1,4 @@
 # hardhat
-An opinionated, production-ready HTTP client for Elixir services
+
+<!-- MDOC -->
+An opinionated, production-ready HTTP client for Elixir services.

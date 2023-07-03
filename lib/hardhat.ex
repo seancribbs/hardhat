@@ -1,18 +1,9 @@
 defmodule Hardhat do
-  @moduledoc """
-  Documentation for `Hardhat`.
-  """
+  @moduledoc "README.md" |> File.read!() |> String.split("<!-- MDOC -->") |> Enum.at(1)
 
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> Hardhat.hello()
-      :world
-
-  """
-  def hello do
-    :world
+  defmacro __using__(opts \\ []) do
+    quote do
+      use Hardhat.Builder, unquote(opts)
+    end
   end
 end
