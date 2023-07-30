@@ -3,6 +3,7 @@ defmodule Hardhat.Builder do
 
   defmacro __using__(opts \\ []) do
     quote do
+      @before_compile Hardhat.Builder
       # docs: false
       use Tesla.Builder, unquote(opts)
 
@@ -18,6 +19,14 @@ defmodule Hardhat.Builder do
       defdelegate pool_options(overrides), to: Hardhat.Defaults
 
       defoverridable pool_options: 1
+    end
+  end
+
+  defmacro __before_compile__(_env) do
+    quote location: :keep do
+      plug(Tesla.Middleware.Telemetry)
+      plug(Tesla.Middleware.OpenTelemetry)
+      plug(Tesla.Middleware.PathParams)
     end
   end
 end
