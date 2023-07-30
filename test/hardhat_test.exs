@@ -79,9 +79,22 @@ defmodule HardhatTest do
 
     assert {:ok, _conn} =
              TestClient.get("http://localhost:#{bypass.port}/user/:id",
-               opts: [path_params: [id: 5]]
+               opts: [path_params: [id: "5"]]
              )
 
     assert_receive {[:tesla, :request, :stop], %{duration: _}, %{env: _}}, 1000
+  end
+
+  test "encodes non-URL-safe characters in path params", %{bypass: bypass} do
+    Bypass.expect_once(bypass, fn conn ->
+      Plug.Conn.resp(conn, 200, "Hello, world")
+    end)
+
+    assert {:ok, env} =
+             TestClient.get("http://localhost:#{bypass.port}/user/:id",
+               opts: [path_params: [id: "%^&*foo"]]
+             )
+
+    refute env.url == "http://localhost:#{bypass.port}/user/%^&*foo"
   end
 end

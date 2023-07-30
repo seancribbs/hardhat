@@ -26,7 +26,7 @@ defmodule Hardhat.Builder do
     quote location: :keep do
       plug(Tesla.Middleware.Telemetry)
       plug(Tesla.Middleware.OpenTelemetry)
-      plug(Tesla.Middleware.PathParams)
+      plug(Hardhat.Middleware.PathParams)
     end
   end
 end
