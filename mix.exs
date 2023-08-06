@@ -26,6 +26,7 @@ defmodule Hardhat.MixProject do
       {:telemetry, "~> 1.2"},
       {:opentelemetry_tesla, "~> 2.2"},
       {:opentelemetry, "~> 1.3", only: :test},
+      {:fuse, "~> 2.5"},
       # {:recon, "~> 2.5.3", only: :test},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:dialyxir, "~> 1.3.0", only: :dev},

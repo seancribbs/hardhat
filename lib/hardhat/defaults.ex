@@ -15,4 +15,21 @@ defmodule Hardhat.Defaults do
       default: [size: 10]
     }
   end
+
+  @doc """
+  Default implementation of the "melt test" for circuit breaking. This
+  function will cause the circuit breaker to record an error when the
+  result of a request is:
+
+  * A TCP-level error, e.g. `{:error, :econnrefused}`
+  * An HTTP status that indicates a server error or proxy-level error (>= 500)
+  * An `429 Too Many Requests` HTTP status
+  """
+  def should_melt({:error, _}) do
+    true
+  end
+
+  def should_melt({:ok, %Tesla.Env{} = env}) do
+    env.status >= 500 || env.status == 429
+  end
 end

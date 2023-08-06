@@ -9,6 +9,6 @@ An opinionated, production-ready HTTP client for Elixir services.
 
 - [X] Connection pooling per-client module
 - [X] Integration with `telemetry` and `opentelemetry` instrumentation
-- [ ] Circuit breaking for repeatedly failed requests
+- [X] Circuit breaking for repeatedly failed requests
 - [ ] Timeout and deadline support
 - [ ] Automatic retries for failed requests
