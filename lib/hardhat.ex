@@ -6,4 +6,6 @@ defmodule Hardhat do
       use Hardhat.Builder, unquote(opts)
     end
   end
+
+  use Hardhat.Builder
 end
