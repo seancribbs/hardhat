@@ -24,3 +24,6 @@ hardhat-*.tar
 
 # Temporary files, for example, from tests.
 /tmp/
+
+# `mix decompile` output
+Elixir.*.ex
