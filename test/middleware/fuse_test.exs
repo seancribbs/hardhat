@@ -5,6 +5,12 @@ defmodule Hardhat.FuseTest do
     use Hardhat
 
     @fuse_thresholds {{:standard, 3, 100}, {:reset, 1000}}
+
+    def fuse_opts do
+      __MODULE__
+      |> Hardhat.Defaults.fuse_opts()
+      |> Keyword.put(:opts, @fuse_thresholds)
+    end
   end
 
   setup do
@@ -12,6 +18,15 @@ defmodule Hardhat.FuseTest do
     pool = start_supervised!(TestClient)
     :fuse.reset(TestClient)
     {:ok, %{bypass: bypass, pool: pool}}
+  end
+
+  describe "fuse options" do
+    test "get injected into the middleware stack for Tesla.Middleware.Fuse" do
+      assert {Tesla.Middleware.Fuse, :call, [opts]} =
+               List.keyfind!(TestClient.__middleware__(), Tesla.Middleware.Fuse, 0)
+
+      assert {{:standard, 3, 100}, {:reset, 1000}} = Keyword.fetch!(opts, :opts)
+    end
   end
 
   describe "default should_melt" do

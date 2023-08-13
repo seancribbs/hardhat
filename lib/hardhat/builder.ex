@@ -9,8 +9,6 @@ defmodule Hardhat.Builder do
 
       adapter(Tesla.Adapter.Finch, name: __MODULE__)
 
-      @fuse_thresholds {{:standard, 50, 1_000}, {:reset, 2_000}}
-
       @doc false
       def child_spec(opts \\ []) do
         Supervisor.child_spec({Finch, name: __MODULE__, pools: pool_options(opts)},
@@ -21,19 +19,18 @@ defmodule Hardhat.Builder do
       defdelegate pool_options(overrides), to: Hardhat.Defaults
       defdelegate should_melt(env), to: Hardhat.Defaults
 
-      defoverridable pool_options: 1, should_melt: 1
+      @doc false
+      def fuse_opts() do
+        Hardhat.Defaults.fuse_opts(__MODULE__)
+      end
+
+      defoverridable pool_options: 1, should_melt: 1, fuse_opts: 0
     end
   end
 
   defmacro __before_compile__(_env) do
     quote location: :keep do
-      plug(Tesla.Middleware.Fuse,
-        opts: @fuse_thresholds,
-        keep_original_error: true,
-        should_melt: &__MODULE__.should_melt/1,
-        mode: :async_dirty
-      )
-
+      plug(Tesla.Middleware.Fuse, __MODULE__.fuse_opts())
       plug(Tesla.Middleware.Telemetry)
       plug(Tesla.Middleware.OpenTelemetry)
       plug(Hardhat.Middleware.PathParams)

@@ -32,4 +32,30 @@ defmodule Hardhat.Defaults do
   def should_melt({:ok, %Tesla.Env{} = env}) do
     env.status >= 500 || env.status == 429
   end
+
+  @doc """
+  Default implementation of the options to the `Tesla.Middleware.Fuse` that is
+  included in the default middleware stack.
+
+  Takes the client module name as an argument.
+
+  These defaults include:
+  - `:opts` - The fuse will blow after 50 errors with 1 second, and reset after 2 seconds
+  - `:keep_original_error` - The original error will be returned when a fuse first blows
+  - `:should_melt` - The `should_melt/1` function defined in the client module is used
+     (by default this is `Hardhat.Defaults.should_melt/1`)
+  - `:mode` - The fuse uses `:async_dirty` mode to check the failure rate, which may result
+    in some delay in blowing the fuse under high concurrency, but it will not serialize
+    checks to the fuse state through a single process
+
+  See `Tesla.Middleware.Fuse` for more information on how to configure the middleware.
+  """
+  def fuse_opts(mod) do
+    [
+      opts: {{:standard, 50, 1_000}, {:reset, 2_000}},
+      keep_original_error: true,
+      should_melt: &mod.should_melt/1,
+      mode: :async_dirty
+    ]
+  end
 end
