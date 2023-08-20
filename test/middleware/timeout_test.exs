@@ -33,10 +33,9 @@ defmodule Hardhat.Middleware.TimeoutTest do
     {:ok, %{bypass: bypass, pool: pool}}
   end
 
-  @tag skip: "timeout race condition?"
   test "returns timeout error after the specified period", %{bypass: bypass} do
     Bypass.expect_once(bypass, fn conn ->
-      Process.sleep(1000)
+      Process.sleep(1_000)
       Plug.Conn.resp(conn, 200, "Hello, world")
     end)
 
@@ -47,7 +46,8 @@ defmodule Hardhat.Middleware.TimeoutTest do
         assert {:error, :timeout} = TestClient.get("http://localhost:#{bypass.port}/")
       end)
 
-    assert_receive {:EXIT, ^pid, :normal}, 200
+    assert_receive {:EXIT, ^pid, :normal}, 500
+    Bypass.pass(bypass)
   end
 
   test "propagates OpenTelemetry tracing context into the timeout", %{bypass: bypass} do
@@ -63,7 +63,6 @@ defmodule Hardhat.Middleware.TimeoutTest do
     assert_receive {:span, span(name: "HTTP GET", parent_span_id: ^span_id)}
   end
 
-  @tag skip: "timeout race condition?"
   test "adds a span event to the current OpenTelemetry span when timeout is exceeded", %{
     bypass: bypass
   } do
@@ -87,5 +86,6 @@ defmodule Hardhat.Middleware.TimeoutTest do
     assert %{module: TestClient, timeout: 100} = attrs
 
     refute_receive {:span, span(name: "HTTP GET", parent_span_id: ^span_id)}
+    Bypass.pass(bypass)
   end
 end
