@@ -58,4 +58,15 @@ defmodule Hardhat.Defaults do
       mode: :async_dirty
     ]
   end
+
+  @doc """
+  Default implementation of the options to `Hardhat.Middleware.DeadlinePropagation` that
+  is included in the default middleware stack.
+
+  These defaults include:
+  - `:header` - `"deadline"` is the name of the header added to the request
+  """
+  def deadline_propagation_opts() do
+    [header: "deadline"]
+  end
 end

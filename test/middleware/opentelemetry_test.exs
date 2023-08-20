@@ -30,7 +30,6 @@ defmodule Hardhat.OpentelemetryTest do
     {:ok, %{bypass: bypass, pool: pool}}
   end
 
-  # @tag skip: "OpenTelemetry PID exporter is brittle?"
   test "records spans for simple requests", %{bypass: bypass} do
     Bypass.expect_once(bypass, fn conn ->
       Plug.Conn.resp(conn, 200, "Hello, world")

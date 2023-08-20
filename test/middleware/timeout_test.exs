@@ -43,6 +43,8 @@ defmodule Hardhat.Middleware.TimeoutTest do
 
     pid =
       spawn_link(fn ->
+        # Deadlines will not affect this request because it unset
+        assert nil == Deadline.get()
         assert {:error, :timeout} = TestClient.get("http://localhost:#{bypass.port}/")
       end)
 
@@ -86,6 +88,37 @@ defmodule Hardhat.Middleware.TimeoutTest do
     assert %{module: TestClient, timeout: 100} = attrs
 
     refute_receive {:span, span(name: "HTTP GET", parent_span_id: ^span_id)}
+    Bypass.pass(bypass)
+  end
+
+  test "uses the smaller of the set deadline or the configured timeout", %{bypass: bypass} do
+    # Normal timeout is used when deadline is not set
+    assert nil == Deadline.get()
+
+    Bypass.expect_once(bypass, fn conn ->
+      Process.sleep(40)
+      Plug.Conn.resp(conn, 200, "Hello, world")
+    end)
+
+    assert {:ok, _} = TestClient.get("http://localhost:#{bypass.port}/")
+
+    # Set a deadline that is smaller than the configured timeout
+    Bypass.expect_once(bypass, fn conn ->
+      Process.sleep(75)
+      Plug.Conn.resp(conn, 200, "Hello, world")
+    end)
+
+    Deadline.set(25)
+    assert {:error, :timeout} = TestClient.get("http://localhost:#{bypass.port}/")
+
+    # Set a deadline that is larger than the configured timeout
+    Bypass.expect_once(bypass, fn conn ->
+      Process.sleep(120)
+      Plug.Conn.resp(conn, 200, "Hello, world")
+    end)
+
+    Deadline.set(200)
+    assert {:error, :timeout} = TestClient.get("http://localhost:#{bypass.port}/")
     Bypass.pass(bypass)
   end
 end

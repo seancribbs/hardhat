@@ -17,8 +17,19 @@ defmodule Hardhat.Middleware.Timeout do
   @impl Tesla.Middleware
   def call(env = %Tesla.Env{}, next, opts) do
     opts = opts || []
-    timeout = Keyword.fetch!(opts, :timeout)
-    task = safe_async(fn -> Tesla.run(env, next) end)
+    configured_timeout = Keyword.fetch!(opts, :timeout)
+
+    {timeout, is_deadline} =
+      case Deadline.time_remaining() do
+        :infinity -> {configured_timeout, false}
+        value -> {min(value, configured_timeout), true}
+      end
+
+    task =
+      safe_async(fn ->
+        if is_deadline, do: Deadline.set(timeout)
+        Tesla.run(env, next)
+      end)
 
     try do
       task
