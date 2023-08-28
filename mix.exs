@@ -31,7 +31,7 @@ defmodule Hardhat.MixProject do
       {:deadline, "~> 0.7.1"},
       # {:recon, "~> 2.5.3", only: :test},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
-      {:dialyxir, "~> 1.3.0", only: :dev},
+      {:dialyxir, "~> 1.4.0", only: :dev},
       {:bypass, "~> 2.1.0", only: :test}
     ]
   end
