@@ -11,6 +11,13 @@ defmodule Hardhat.FuseTest do
       |> Hardhat.Defaults.fuse_opts()
       |> Keyword.put(:opts, @fuse_thresholds)
     end
+
+    # NOTE: retries can interact badly with fuse, so let's not retry in test
+    def retry_opts do
+      [
+        max_retries: 0
+      ]
+    end
   end
 
   setup do

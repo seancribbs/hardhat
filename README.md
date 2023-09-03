@@ -11,4 +11,4 @@ An opinionated, production-ready HTTP client for Elixir services.
 - [X] Integration with `telemetry` and `opentelemetry` instrumentation
 - [X] Circuit breaking for repeatedly failed requests
 - [X] Timeout and `deadline` support
-- [ ] Automatic retries for failed requests
+- [X] Automatic retries for failed requests
