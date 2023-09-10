@@ -110,4 +110,46 @@ defmodule Hardhat.Defaults do
   def should_retry({:ok, %Tesla.Env{} = env}) do
     env.status == 429 || env.status >= 500
   end
+
+  @doc """
+  Default options for the `Regulator` middleware, which can be used as an
+  alternative circuit-breaking strategy to `fuse`.
+
+  The defaults include:
+  * `:min_limit` - The minimum concurrency limit (defaults to 5)
+  * `:initial_limit` - The initial concurrency limit when the regulator is installed (deafults to 20)
+  * `:max_limit` - The maximum concurrency limit (defaults to 200)
+  * `:step_increase` - The number of tokens to add when regulator is increasing the concurrency limit (defaults to 10).
+  * `:backoff_ratio` - Floating point value for how quickly to reduce the concurrency limit (defaults to 0.9)
+  * `:target_avg_latency` - This is the average latency in milliseconds for the system regulator is protecting. If the average latency drifts above this value Regulator considers it an error and backs off. Defaults to 5.
+  * `:should_regulate` - Whether to consider the result of the request as failed, defaults to `should_regulate/1`.
+  """
+  def regulator_opts(mod) do
+    [
+      min_limit: 5,
+      initial_limit: 20,
+      max_limit: 200,
+      backoff_ratio: 0.9,
+      target_avg_latency: 5,
+      step_increase: 10,
+      should_regulate: &mod.should_regulate/1
+    ]
+  end
+
+  @doc """
+  Default implementation of the "failure test" for dynamic regulation. This
+  function will cause the `Regulator` to record an error when the
+  result of a request is:
+
+  * A TCP-level error, e.g. `{:error, :econnrefused}`
+  * An HTTP status that indicates a server error or proxy-level error (>= 500)
+  * An `429 Too Many Requests` HTTP status
+  """
+  def should_regulate({:error, _}) do
+    true
+  end
+
+  def should_regulate({:ok, %Tesla.Env{} = env}) do
+    env.status >= 500 || env.status == 429
+  end
 end
