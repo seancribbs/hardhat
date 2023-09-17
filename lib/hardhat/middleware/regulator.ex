@@ -1,4 +1,15 @@
 defmodule Hardhat.Middleware.Regulator do
+  @moduledoc """
+  Limits concurrent requests to the server based on a [loss based dynamic limit algorithm](`Regulator.Limit.AIMD`).
+  Additively increases the concurrency limit when there are no errors and multiplicatively
+  decrements the limit when there are errors.
+
+  _This middleware is part of the default stack when giving the `strategy: :regulator` option to `use Hardhat`._
+
+  See also:
+  - Configuration options: `Hardhat.Defaults.regulator_opts/1`
+  - Determining what amounts to an error: `Hardhat.Defaults.should_regulate/1`
+  """
   @behaviour Tesla.Middleware
 
   @impl Tesla.Middleware

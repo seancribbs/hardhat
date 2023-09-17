@@ -1,7 +1,8 @@
 defmodule Hardhat.Middleware.PathParams do
   @moduledoc """
   Use templated URLs with separate params. Unlike `Tesla.Middleware.PathParams`,
-  we ensure that all parameters are URL-safe.
+  we ensure that all parameters are URL-safe. _This middleware is part of the
+  default stack_.
   """
 
   @behaviour Tesla.Middleware

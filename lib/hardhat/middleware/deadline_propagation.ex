@@ -1,7 +1,9 @@
 defmodule Hardhat.Middleware.DeadlinePropagation do
   @moduledoc """
-  Propagates `Deadline` information across the request to the
-  server being called.
+  Propagates `Deadline` information to the server being called via
+  an HTTP header. _This middleware is part of the default stack_.
+
+  Expects a `:header` option, which defaults to `"deadline"`. See `Hardhat.Defaults.deadline_propagation_opts/0`.
   """
 
   @behaviour Tesla.Middleware

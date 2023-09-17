@@ -8,6 +8,8 @@ defmodule Hardhat.Builder do
         invalid -> raise "Invalid strategy #{inspect(invalid)}"
       end
 
+    opts = opts |> Keyword.delete(:strategy) |> Keyword.put_new(:docs, false)
+
     client_mod = __CALLER__.module
     regulator_name = Module.concat(client_mod, Regulator)
 
@@ -20,7 +22,6 @@ defmodule Hardhat.Builder do
 
     quote location: :keep do
       @before_compile Hardhat.Builder
-      # docs: false
       use Tesla.Builder, unquote(opts)
 
       @strategy unquote(strategy)
@@ -28,6 +29,7 @@ defmodule Hardhat.Builder do
       adapter(Tesla.Adapter.Finch, name: __MODULE__)
 
       defmodule Sup do
+        @moduledoc false
         use Supervisor
 
         def start_link(init_arg) do
@@ -45,14 +47,20 @@ defmodule Hardhat.Builder do
         end
       end
 
+      @doc false
       def child_spec(opts) do
         Supervisor.child_spec(__MODULE__.Sup, opts)
       end
 
+      @doc false
       defdelegate pool_options(overrides), to: Hardhat.Defaults
+      @doc false
       defdelegate should_melt(env), to: Hardhat.Defaults
+      @doc false
       defdelegate deadline_propagation_opts(), to: Hardhat.Defaults
+      @doc false
       defdelegate should_retry(result), to: Hardhat.Defaults
+      @doc false
       defdelegate should_regulate(result), to: Hardhat.Defaults
 
       @doc false
