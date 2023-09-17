@@ -22,7 +22,8 @@ defmodule Hardhat.Middleware.RegulatorTest do
     end
   end
 
-  test "returns not-installed error when regulator is missing and does not automatically install it" do
+  test "returns not-installed error when regulator is missing and does not automatically install it",
+       %{bypass: bypass} do
     TestClient.uninstall_regulator()
 
     assert {:error, {:regulator_not_installed, TestClient.Regulator}} =
