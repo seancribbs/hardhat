@@ -7,8 +7,8 @@ defmodule Hardhat.Middleware.RegulatorTest do
 
   setup do
     bypass = Bypass.open()
+    TestClient.uninstall_regulator()
     pool = start_supervised!(TestClient)
-    Regulator.uninstall(TestClient.Regulator)
     {:ok, %{bypass: bypass, pool: pool}}
   end
 
@@ -22,16 +22,13 @@ defmodule Hardhat.Middleware.RegulatorTest do
     end
   end
 
-  test "installs a regulator for the client", %{bypass: bypass} do
-    Bypass.expect_once(bypass, fn conn ->
-      Plug.Conn.resp(conn, 200, "Hello, world")
-    end)
+  test "returns not-installed error when regulator is missing and does not automatically install it" do
+    TestClient.uninstall_regulator()
+
+    assert {:error, {:regulator_not_installed, TestClient.Regulator}} =
+             TestClient.get("http://localhost:#{bypass.port}/")
 
     assert is_nil(Process.whereis(TestClient.Regulator))
-
-    assert {:ok, _env} = TestClient.get("http://localhost:#{bypass.port}/")
-
-    assert is_pid(Process.whereis(TestClient.Regulator))
   end
 
   def send_to_test(event, measurements, metadata, pid) do

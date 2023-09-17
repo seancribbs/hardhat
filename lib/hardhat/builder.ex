@@ -8,7 +8,17 @@ defmodule Hardhat.Builder do
         invalid -> raise "Invalid strategy #{inspect(invalid)}"
       end
 
-    quote do
+    client_mod = __CALLER__.module
+    regulator_name = Module.concat(client_mod, Regulator)
+
+    install_regulator =
+      if strategy == :regulator do
+        quote location: :keep do
+          unquote(client_mod).install_regulator()
+        end
+      end
+
+    quote location: :keep do
       @before_compile Hardhat.Builder
       # docs: false
       use Tesla.Builder, unquote(opts)
@@ -17,11 +27,26 @@ defmodule Hardhat.Builder do
 
       adapter(Tesla.Adapter.Finch, name: __MODULE__)
 
-      @doc false
-      def child_spec(opts \\ []) do
-        Supervisor.child_spec({Finch, name: __MODULE__, pools: pool_options(opts)},
-          id: __MODULE__
-        )
+      defmodule Sup do
+        use Supervisor
+
+        def start_link(init_arg) do
+          Supervisor.start_link(__MODULE__, init_arg, name: __MODULE__)
+        end
+
+        def init(opts) do
+          unquote(install_regulator)
+
+          children = [
+            {Finch, name: unquote(client_mod), pools: unquote(client_mod).pool_options(opts)}
+          ]
+
+          Supervisor.init(children, strategy: :one_for_one)
+        end
+      end
+
+      def child_spec(opts) do
+        Supervisor.child_spec(__MODULE__.Sup, opts)
       end
 
       defdelegate pool_options(overrides), to: Hardhat.Defaults
@@ -43,6 +68,19 @@ defmodule Hardhat.Builder do
       @doc false
       def regulator_opts() do
         Hardhat.Defaults.regulator_opts(__MODULE__)
+      end
+
+      @doc false
+      def install_regulator() do
+        Regulator.install(
+          unquote(regulator_name),
+          {Regulator.Limit.AIMD, Keyword.delete(regulator_opts(), :should_regulate)}
+        )
+      end
+
+      @doc false
+      def uninstall_regulator() do
+        Regulator.uninstall(unquote(regulator_name))
       end
 
       defoverridable pool_options: 1,
