@@ -32,7 +32,7 @@ defmodule Hardhat.MixProject do
       {:regulator, "~> 0.5.0"},
       {:deadline, "~> 0.7.1"},
       # NOTE: Upgrade ex_doc past 0.30.6 when they fix the broken CSS
-      {:ex_doc, "0.30.5", only: :dev, runtime: false},
+      {:ex_doc, "0.30.6", only: :dev, runtime: false},
       {:dialyxir, "~> 1.4.0", only: :dev},
       {:bypass, "~> 2.1.0", only: :test}
     ]
