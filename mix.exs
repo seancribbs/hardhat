@@ -14,12 +14,16 @@ defmodule Hardhat.MixProject do
     ]
   end
 
-  # Run "mix help compile.app" to learn about applications.
   def application do
-    []
+    [
+      mod: {Hardhat.Application, []},
+      env: [
+        start_default_client: false
+      ],
+      registered: [Hardhat.Supervisor, Hardhat, Hardhat.Sup]
+    ]
   end
 
-  # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
       {:tesla, "~> 1.7"},
@@ -31,8 +35,9 @@ defmodule Hardhat.MixProject do
       {:fuse, "~> 2.5"},
       {:regulator, "~> 0.5.0"},
       {:deadline, "~> 0.7.1"},
+      # {:recon, "~> 2.5.4"},
       {:ex_doc, "~> 0.30.6", only: :dev, runtime: false},
-      {:dialyxir, "~> 1.4.0", only: :dev},
+      {:dialyxir, "~> 1.4.0", only: :dev, runtime: false},
       {:bypass, "~> 2.1.0", only: :test}
     ]
   end

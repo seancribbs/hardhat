@@ -26,9 +26,9 @@ defmodule Hardhat.Builder do
 
       @strategy unquote(strategy)
 
-      adapter(Tesla.Adapter.Finch, name: __MODULE__)
+      adapter(Tesla.Adapter.Finch, name: __MODULE__.ConnectionPool)
 
-      defmodule Sup do
+      defmodule ClientSupervisor do
         @moduledoc false
         use Supervisor
 
@@ -40,7 +40,9 @@ defmodule Hardhat.Builder do
           unquote(install_regulator)
 
           children = [
-            {Finch, name: unquote(client_mod), pools: unquote(client_mod).pool_options(opts)}
+            {Finch,
+             name: unquote(client_mod).ConnectionPool,
+             pools: unquote(client_mod).pool_options(opts)}
           ]
 
           Supervisor.init(children, strategy: :one_for_one)
@@ -49,7 +51,7 @@ defmodule Hardhat.Builder do
 
       @doc false
       def child_spec(opts) do
-        Supervisor.child_spec(__MODULE__.Sup, opts)
+        Supervisor.child_spec(__MODULE__.ClientSupervisor, opts)
       end
 
       @doc false
