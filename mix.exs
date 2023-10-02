@@ -4,7 +4,7 @@ defmodule Hardhat.MixProject do
   def project do
     [
       app: :hardhat,
-      version: "1.0.0-rc.3",
+      version: "1.0.0-rc.4",
       elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
