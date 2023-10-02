@@ -113,7 +113,7 @@ defmodule Hardhat.Defaults do
 
   @doc """
   Default options for the `Regulator` middleware, which can be used as an
-  alternative circuit-breaking strategy to `fuse`.
+  alternative circuit-breaking strategy to `:fuse`.
 
   The defaults include:
   * `:min_limit` - The minimum concurrency limit (defaults to 5)
