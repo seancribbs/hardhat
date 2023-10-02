@@ -1,0 +1,48 @@
+name: Release
+on:
+  push:
+    tags:
+      - '*'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  release:
+    name: Release package to Hex.pm
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        otp: [26.x]
+        elixir: [1.15.x]
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: ${{matrix.otp}}
+          elixir-version: ${{matrix.elixir}}
+      - uses: actions/cache@v3
+        with:
+          path: |
+            deps
+            _build
+          key: ${{ runner.os }}-mix-${{matrix.otp}}-${{matrix.elixir}}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-mix-${{matrix.otp}}-${{matrix.elixir}}-
+
+      - name: Install Dependencies
+        run: mix deps.get
+
+      - name: Compile
+        run: mix compile
+
+      - name: Generate docs
+        run: mix docs
+
+      - name: Release to hex.pm
+        env:
+          HEX_API_KEY: ${{ secrets.HEX_PM_KEY }}
+        run: mix hex.publish --yes
