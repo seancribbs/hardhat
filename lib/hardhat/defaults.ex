@@ -5,15 +5,19 @@ defmodule Hardhat.Defaults do
   """
 
   @doc """
-  The default options for the connection pool that will be created when your
-  client is added to the supervision tree.
+  The default configuration for the connection pool(s) that will be created when your
+  client is added to the supervision tree. Overrides to the pool can be passed
+  at startup time as an argument in the supervision tree (see `Supervisor.child_spec/2`).
 
-  This creates a connection pool of size `10`.
+  This creates a connection pool of size `10`. See `Finch.start_link/1` for more details.
   """
-  def pool_options(_overrides \\ []) do
-    %{
-      default: [size: 10]
-    }
+  def pool_configuration(overrides \\ %{}) when is_list(overrides) or is_map(overrides) do
+    Map.merge(
+      %{
+        default: [size: 10]
+      },
+      Map.new(overrides)
+    )
   end
 
   @doc """

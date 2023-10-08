@@ -42,7 +42,7 @@ defmodule Hardhat.Builder do
           children = [
             {Finch,
              name: unquote(client_mod).ConnectionPool,
-             pools: unquote(client_mod).pool_options(opts)}
+             pools: unquote(client_mod).pool_configuration(opts)}
           ]
 
           Supervisor.init(children, strategy: :one_for_one)
@@ -55,7 +55,7 @@ defmodule Hardhat.Builder do
       end
 
       @doc false
-      defdelegate pool_options(overrides), to: Hardhat.Defaults
+      defdelegate pool_configuration(overrides), to: Hardhat.Defaults
       @doc false
       defdelegate should_melt(env), to: Hardhat.Defaults
       @doc false
@@ -96,7 +96,7 @@ defmodule Hardhat.Builder do
         Regulator.uninstall(unquote(regulator_name))
       end
 
-      defoverridable pool_options: 1,
+      defoverridable pool_configuration: 1,
                      should_melt: 1,
                      fuse_opts: 0,
                      deadline_propagation_opts: 0,
