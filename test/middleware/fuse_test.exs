@@ -7,9 +7,7 @@ defmodule Hardhat.FuseTest do
     @fuse_thresholds {{:standard, 3, 100}, {:reset, 1000}}
 
     def fuse_opts do
-      __MODULE__
-      |> Hardhat.Defaults.fuse_opts()
-      |> Keyword.put(:opts, @fuse_thresholds)
+      [opts: @fuse_thresholds]
     end
 
     # NOTE: retries can interact badly with fuse, so let's not retry in test

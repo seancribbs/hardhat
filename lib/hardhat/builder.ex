@@ -59,7 +59,10 @@ defmodule Hardhat.Builder do
       @doc false
       defdelegate should_melt(env), to: Hardhat.Defaults
       @doc false
-      defdelegate deadline_propagation_opts(), to: Hardhat.Defaults
+      def deadline_propagation_opts() do
+        []
+      end
+
       @doc false
       defdelegate should_retry(result), to: Hardhat.Defaults
       @doc false
@@ -67,17 +70,17 @@ defmodule Hardhat.Builder do
 
       @doc false
       def retry_opts() do
-        Hardhat.Defaults.retry_opts(__MODULE__)
+        []
       end
 
       @doc false
       def fuse_opts() do
-        Hardhat.Defaults.fuse_opts(__MODULE__)
+        []
       end
 
       @doc false
       def regulator_opts() do
-        Hardhat.Defaults.regulator_opts(__MODULE__)
+        []
       end
 
       @doc false
@@ -109,18 +112,44 @@ defmodule Hardhat.Builder do
       case Module.get_attribute(env.module, :strategy) do
         :fuse ->
           quote do
-            plug(Tesla.Middleware.Fuse, __MODULE__.fuse_opts())
+            plug(
+              Tesla.Middleware.Fuse,
+              Keyword.merge(
+                Hardhat.Defaults.fuse_opts(__MODULE__),
+                __MODULE__.fuse_opts()
+              )
+            )
           end
 
         :regulator ->
           quote do
-            plug(Hardhat.Middleware.Regulator, __MODULE__.regulator_opts())
+            plug(
+              Hardhat.Middleware.Regulator,
+              Keyword.merge(
+                Hardhat.Defaults.regulator_opts(__MODULE__),
+                __MODULE__.regulator_opts()
+              )
+            )
           end
       end
 
     quote location: :keep do
-      plug(Hardhat.Middleware.DeadlinePropagation, __MODULE__.deadline_propagation_opts())
-      plug(Tesla.Middleware.Retry, __MODULE__.retry_opts())
+      plug(
+        Hardhat.Middleware.DeadlinePropagation,
+        Keyword.merge(
+          Hardhat.Defaults.deadline_propagation_opts(),
+          __MODULE__.deadline_propagation_opts()
+        )
+      )
+
+      plug(
+        Tesla.Middleware.Retry,
+        Keyword.merge(
+          Hardhat.Defaults.retry_opts(__MODULE__),
+          __MODULE__.retry_opts()
+        )
+      )
+
       unquote(circuit_breaker)
       plug(Tesla.Middleware.Telemetry)
       plug(Tesla.Middleware.OpenTelemetry)
