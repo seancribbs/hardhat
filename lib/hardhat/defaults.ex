@@ -104,15 +104,15 @@ defmodule Hardhat.Defaults do
   * An HTTP status that indicates a server error or proxy-level error (>= 500)
   * An `429 Too Many Requests` HTTP status
 
-  In the case where the circuit breaker has been triggered, requests will
-  not be retried.
+  In the case where the circuit breaker has been triggered, or the request method
+  was `POST`, requests will not be retried.
   """
   def should_retry({:error, :unavailable}), do: false
 
   def should_retry({:error, _}), do: true
 
   def should_retry({:ok, %Tesla.Env{} = env}) do
-    env.status == 429 || env.status >= 500
+    env.method !== :post && (env.status == 429 || env.status >= 500)
   end
 
   @doc """

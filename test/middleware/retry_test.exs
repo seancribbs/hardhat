@@ -41,6 +41,22 @@ defmodule Hardhat.RetryTest do
       refute_receive :request
     end
 
+    test "does not retry on POST requests", %{bypass: bypass} do
+      parent = self()
+
+      Bypass.stub(bypass, "POST", "/", fn conn ->
+        send(parent, :request)
+        Plug.Conn.resp(conn, 500, "Oops")
+      end)
+
+      assert {:ok, %Tesla.Env{status: 500}} =
+               TestClient.post("http://localhost:#{bypass.port}/", "boom")
+
+      assert_receive :request
+
+      refute_receive :request, 1000, "request was retried!"
+    end
+
     test "retries when there is a TCP-level error", %{bypass: bypass} do
       parent = self()
 
