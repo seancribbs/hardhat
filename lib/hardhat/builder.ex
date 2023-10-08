@@ -4,7 +4,7 @@ defmodule Hardhat.Builder do
   defmacro __using__(opts \\ []) do
     strategy =
       case Keyword.get(opts, :strategy, :fuse) do
-        v when v in [:fuse, :regulator] -> v
+        v when v in [:fuse, :regulator, :none] -> v
         invalid -> raise "Invalid strategy #{inspect(invalid)}"
       end
 
@@ -131,6 +131,9 @@ defmodule Hardhat.Builder do
               )
             )
           end
+
+        :none ->
+          quote(do: nil)
       end
 
     quote location: :keep do

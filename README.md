@@ -93,16 +93,16 @@ In addition to the adapter selection and default `Tesla` behavior,
 
 ## Connection pools
 
-As mentioned above, `Hardhat` uses `Finch` as the adapter. By [default](`Hardhat.Defaults.pool_options/1`), `Hardhat` specifies a connection pool of size `10` but sets no [other options](`Finch.start_link/1`) on the adapter. The name of the `Finch` process is proscribed by the `use Hardhat` macro, but you can set any other options for the pool that you like, including creating more than one pool or setting the HTTP protocol or TLS options by overriding the `pool_options/1` function.
+As mentioned above, `Hardhat` uses `Finch` as the adapter. By [default](`Hardhat.Defaults.pool_configuration/1`), `Hardhat` specifies a connection pool of size `10` but sets no [other options](`Finch.start_link/1`) on the adapter. The name of the `Finch` process is proscribed by the `use Hardhat` macro, but you can set any other options for the pool that you like, including creating more than one pool or setting the HTTP protocol or TLS options by overriding the `pool_configuration/1` function.
 
 ```elixir
 defmodule H2Client do
   use Hardhat
 
-  # This function overrides the default coming from `Hardhat.Defaults`.
+  # This function overrides the configuration coming from `Hardhat.Defaults`.
   # The `overrides` will be passed from your process supervision initial
   # arguments.
-  def pool_options(_overrides \\ []) do
+  def pool_configuration(_overrides \\ %{}) do
     %{
       # By default we'll use HTTP/2, with 3 pools of one connection each
       :default => [
@@ -232,9 +232,21 @@ defmodule DynamicRegulationClient do
   end
 end
 ```
-## Retries
 
-TODO: default options, note about interactions with failure detection
+### Disabling failure detection
+
+> #### Warning {: .warning}
+> We do not recommend disabling failure detection and backoff strategies because they open you up to encountering cascading failure and slowdown when the target service or network is encountering issues.
+
+If you want to disable failure detection, set the strategy to `:none`:
+
+```elixir
+defmodule WildAndFree do
+  use Hardhat, strategy: :none
+end
+```
+
+## Retries
 
 `Hardhat` injects automatic retries on your requests using `Tesla.Middleware.Retry`. Retries are configured with two functions in your client which have default implementations that are injected at compile-time:
 
