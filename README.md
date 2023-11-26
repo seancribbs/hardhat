@@ -151,7 +151,22 @@ end
 )
 ```
 
-`Hardhat` wraps each request in an [OpenTelemetry](`Tesla.Middleware.OpenTelemetry`) span and propagates the trace context to the destination host. It does not currently expose the ability to change the span name in the trace, but it will observe any [path parameters](`Hardhat.Middleware.PathParams`) you interpolate into the URL so that similar spans can be easily aggregated.
+`Hardhat` wraps each request in an [OpenTelemetry](`Tesla.Middleware.OpenTelemetry`) span and propagates the trace context to the destination host. It will observe any [path parameters](`Hardhat.Middleware.PathParams`) you interpolate into the URL so that similar spans can be easily aggregated. To disable propagation or change other behavior of the tracing, override the `opentelemetry_opts/0` function:
+
+```elixir
+defmodule NoPropagationClient do
+  use Hardhat
+
+  def opentelemety_opts do
+    [
+      # Disable trace propagation for talking to a third-party API
+      propagator: :none
+    ]
+  end
+end
+```
+
+For more information about the options available to tracing, see `Hardhat.Defaults.opentelemetry_opts/0` or `Tesla.Middleware.OpenTelemetry`.
 
 ## Failure detection
 

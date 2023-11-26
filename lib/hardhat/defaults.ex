@@ -156,4 +156,21 @@ defmodule Hardhat.Defaults do
   def should_regulate({:ok, %Tesla.Env{} = env}) do
     env.status >= 500 || env.status == 429
   end
+
+  @doc """
+  Default options for the `Tesla.Middleware.OpenTelemetry` middleware.
+
+  The options include:
+  * `:span_name` - override span name. Can be a `String` for a static span name,
+     or a function that takes the `Tesla.Env` and returns a `String`. The
+     default span name is chosen by the middleware.
+  * `:propagator` - configures trace headers propagators. Setting it to `:none`
+     disables propagation. Any module that implements `:otel_propagator_text_map`
+     can be used. Defaults to calling `:opentelemetry.get_text_map_injector/0`
+  * `:mark_status_ok` - configures spans with a list of expected HTTP error codes to be
+     marked as ok, not as an error-containing spans. The default is empty.
+  """
+  def opentelemetry_opts do
+    []
+  end
 end

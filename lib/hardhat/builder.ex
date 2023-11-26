@@ -84,6 +84,11 @@ defmodule Hardhat.Builder do
       end
 
       @doc false
+      def opentelemetry_opts() do
+        []
+      end
+
+      @doc false
       def install_regulator() do
         Regulator.install(
           unquote(regulator_name),
@@ -103,7 +108,8 @@ defmodule Hardhat.Builder do
                      retry_opts: 0,
                      should_retry: 1,
                      regulator_opts: 0,
-                     should_regulate: 1
+                     should_regulate: 1,
+                     opentelemetry_opts: 0
     end
   end
 
@@ -155,7 +161,15 @@ defmodule Hardhat.Builder do
 
       unquote(circuit_breaker)
       plug(Tesla.Middleware.Telemetry)
-      plug(Tesla.Middleware.OpenTelemetry)
+
+      plug(
+        Tesla.Middleware.OpenTelemetry,
+        Keyword.merge(
+          Hardhat.Defaults.opentelemetry_opts(),
+          __MODULE__.opentelemetry_opts()
+        )
+      )
+
       plug(Hardhat.Middleware.PathParams)
     end
   end

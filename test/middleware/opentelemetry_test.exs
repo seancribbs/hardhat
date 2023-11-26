@@ -6,6 +6,14 @@ defmodule Hardhat.OpentelemetryTest do
     use Hardhat
   end
 
+  defmodule NoPropagationClient do
+    use Hardhat
+
+    def opentelemetry_opts do
+      [propagator: :none]
+    end
+  end
+
   for {name, spec} <- Record.extract_all(from_lib: "opentelemetry/include/otel_span.hrl") do
     Record.defrecord(name, spec)
   end
@@ -17,6 +25,7 @@ defmodule Hardhat.OpentelemetryTest do
   setup do
     bypass = Bypass.open()
     pool = start_supervised!(TestClient)
+    start_supervised!(NoPropagationClient)
     :application.stop(:opentelemetry)
     :application.set_env(:opentelemetry, :tracer, :otel_tracer_default)
     :application.set_env(:opentelemetry, :traces_exporter, {:otel_exporter_pid, self()})
@@ -53,5 +62,19 @@ defmodule Hardhat.OpentelemetryTest do
              )
 
     assert_receive {:span, span(name: "/user/:id", attributes: _)}, 1000
+  end
+
+  test "does not propagate trace when disabled", %{bypass: bypass} do
+    parent = self()
+
+    Bypass.expect_once(bypass, fn conn ->
+      send(parent, {:traceheader, Plug.Conn.get_req_header(conn, "traceparent")})
+      Plug.Conn.resp(conn, 200, "Hello, world")
+    end)
+
+    assert {:ok, _conn} =
+             NoPropagationClient.get("http://localhost:#{bypass.port}/")
+
+    assert_receive {:traceheader, []}, 1000
   end
 end
