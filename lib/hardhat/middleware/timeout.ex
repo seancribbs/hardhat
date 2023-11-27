@@ -43,15 +43,17 @@ defmodule Hardhat.Middleware.Timeout do
       end
 
     task =
-      safe_async(fn ->
-        if is_deadline, do: Deadline.set(timeout)
-        Tesla.run(env, next)
-      end)
+      if is_deadline do
+        safe_async(fn ->
+          Deadline.set(timeout)
+          Tesla.run(env, next)
+        end)
+      else
+        safe_async(fn -> Tesla.run(env, next) end)
+      end
 
     try do
-      task
-      |> Task.await(timeout)
-      |> repass_error
+      Task.await(task, timeout)
     catch
       :exit, {:timeout, _} ->
         Task.shutdown(task, 0)
@@ -62,6 +64,18 @@ defmodule Hardhat.Middleware.Timeout do
         )
 
         {:error, :timeout}
+    else
+      {:exception, error, stacktrace} ->
+        reraise(error, stacktrace)
+
+      {:throw, value} ->
+        throw(value)
+
+      {:exit, value} ->
+        exit(value)
+
+      {:ok, result} ->
+        result
     end
   end
 
@@ -78,12 +92,4 @@ defmodule Hardhat.Middleware.Timeout do
       end
     end)
   end
-
-  defp repass_error({:exception, error, stacktrace}), do: reraise(error, stacktrace)
-
-  defp repass_error({:throw, value}), do: throw(value)
-
-  defp repass_error({:exit, value}), do: exit(value)
-
-  defp repass_error({:ok, result}), do: result
 end

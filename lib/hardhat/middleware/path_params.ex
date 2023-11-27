@@ -10,11 +10,11 @@ defmodule Hardhat.Middleware.PathParams do
   @impl Tesla.Middleware
   def call(env, next, _) do
     env =
-      if env.opts[:path_params] do
+      if path_params = env.opts[:path_params] do
         urlsafe =
-          env.opts[:path_params]
-          |> Enum.map(fn {key, value} -> {key, URI.encode(value, &URI.char_unreserved?/1)} end)
-          |> Enum.to_list()
+          Enum.map(path_params, fn {key, value} ->
+            {key, URI.encode(value, &URI.char_unreserved?/1)}
+          end)
 
         Tesla.put_opt(env, :path_params, urlsafe)
       else
