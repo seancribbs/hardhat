@@ -34,7 +34,7 @@ defmodule Hardhat.Defaults do
   end
 
   def should_melt({:ok, %Tesla.Env{} = env}) do
-    env.status >= 500 || env.status == 429
+    env.status >= 500 or env.status == 429
   end
 
   @doc """
@@ -112,7 +112,7 @@ defmodule Hardhat.Defaults do
   def should_retry({:error, _}), do: true
 
   def should_retry({:ok, %Tesla.Env{} = env}) do
-    env.method !== :post && (env.status == 429 || env.status >= 500)
+    env.method != :post and (env.status == 429 or env.status >= 500)
   end
 
   @doc """
@@ -154,7 +154,7 @@ defmodule Hardhat.Defaults do
   end
 
   def should_regulate({:ok, %Tesla.Env{} = env}) do
-    env.status >= 500 || env.status == 429
+    env.status >= 500 or env.status == 429
   end
 
   @doc """

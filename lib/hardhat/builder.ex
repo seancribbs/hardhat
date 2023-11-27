@@ -4,8 +4,14 @@ defmodule Hardhat.Builder do
   defmacro __using__(opts \\ []) do
     strategy =
       case Keyword.get(opts, :strategy, :fuse) do
-        v when v in [:fuse, :regulator, :none] -> v
-        invalid -> raise "Invalid strategy #{inspect(invalid)}"
+        v when v in [:fuse, :regulator, :none] ->
+          v
+
+        invalid ->
+          raise CompileError,
+            description: "Invalid strategy #{inspect(invalid)}",
+            file: __CALLER__.file,
+            line: __CALLER__.line
       end
 
     opts = opts |> Keyword.delete(:strategy) |> Keyword.put_new(:docs, false)
