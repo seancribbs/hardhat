@@ -4,7 +4,7 @@ defmodule Hardhat.MixProject do
   def project do
     [
       app: :hardhat,
-      version: "1.0.0",
+      version: "1.0.1",
       elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -52,7 +52,8 @@ defmodule Hardhat.MixProject do
 
   defp docs do
     [
-      main: "Hardhat"
+      main: "Hardhat",
+      extras: ["CHANGELOG.md"]
     ]
   end
 end
