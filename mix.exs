@@ -35,7 +35,7 @@ defmodule Hardhat.MixProject do
       {:fuse, "~> 2.5"},
       {:regulator, "~> 0.6.0"},
       {:deadline, "~> 0.7.1"},
-      {:ex_doc, "~> 0.30.6", only: :dev, runtime: false},
+      {:ex_doc, "~> 0.31.0", only: :dev, runtime: false},
       {:dialyxir, "~> 1.4.0", only: :dev, runtime: false},
       {:bypass, "~> 2.1.0", only: :test}
     ]
