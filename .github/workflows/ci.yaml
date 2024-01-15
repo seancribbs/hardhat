@@ -20,7 +20,7 @@ jobs:
         elixir: [1.15.x]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: erlef/setup-beam@v1
         with:
           otp-version: ${{matrix.otp}}
@@ -50,7 +50,7 @@ jobs:
     name: Formatter (1.15.x/26.x)
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: erlef/setup-beam@v1
         id: beam
         with:
@@ -74,7 +74,7 @@ jobs:
   dialyzer:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Set up Elixir
         id: beam
         uses: erlef/setup-beam@v1
