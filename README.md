@@ -114,7 +114,7 @@ defmodule H2Client do
     %{
       # By default we'll use HTTP/2, with 3 pools of one connection each
       :default => [
-        protocol: :http2,
+        protocols: [:http2],
         count: 3
       ],
       # For this host only, we're using HTTP/1.1 and a single pool of 20
