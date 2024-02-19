@@ -31,7 +31,7 @@ defmodule Hardhat.MixProject do
       {:telemetry, "~> 1.2"},
       {:opentelemetry_tesla, "~> 2.3.0"},
       {:opentelemetry, "~> 1.3", only: :test},
-      {:opentelemetry_process_propagator, "~> 0.2.2"},
+      {:opentelemetry_process_propagator, "~> 0.3.0"},
       {:fuse, "~> 2.5"},
       {:regulator, "~> 0.6.0"},
       {:deadline, "~> 0.7.1"},
