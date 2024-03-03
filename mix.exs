@@ -29,7 +29,7 @@ defmodule Hardhat.MixProject do
       {:tesla, "~> 1.7"},
       {:finch, "~> 0.18.0"},
       {:telemetry, "~> 1.2"},
-      {:opentelemetry_tesla, "~> 2.3.0"},
+      {:opentelemetry_tesla, "~> 2.4.0"},
       {:opentelemetry, "~> 1.3", only: :test},
       {:opentelemetry_process_propagator, "~> 0.3.0"},
       {:fuse, "~> 2.5"},
