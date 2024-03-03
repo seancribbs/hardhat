@@ -27,7 +27,7 @@ defmodule Hardhat.MixProject do
   defp deps do
     [
       {:tesla, "~> 1.7"},
-      {:finch, "~> 0.17.0"},
+      {:finch, "~> 0.18.0"},
       {:telemetry, "~> 1.2"},
       {:opentelemetry_tesla, "~> 2.3.0"},
       {:opentelemetry, "~> 1.3", only: :test},
