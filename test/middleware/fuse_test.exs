@@ -39,7 +39,7 @@ defmodule Hardhat.FuseTest do
       Bypass.down(bypass)
 
       for _ <- 0..3 do
-        assert {:error, "connection refused"} = TestClient.get("http://localhost:#{bypass.port}/")
+        assert {:error, :econnrefused} = TestClient.get("http://localhost:#{bypass.port}/")
       end
 
       assert {:error, :unavailable} = TestClient.get("http://localhost:#{bypass.port}/")
